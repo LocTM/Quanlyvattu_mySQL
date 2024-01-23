@@ -193,4 +193,134 @@ FROM
     VatTu ON CTPN.vat_tu_id = VatTu.id;
 SELECT * FROM vw_CTPNHAP_VT;
 
+-- Câu 3: Tạo view có tên vw_CTPNHAP_VT_PN bao gồm các thông tin sau:
+-- số phiếu nhập hàng, ngày nhập hàng, số đơn đặt hàng, mã vật tư, tên vật tư, số lượng nhập, đơn giá nhập, thành tiền nhập.
+CREATE VIEW vw_CTPNHAP_VT_PN AS
+SELECT
+    PhieuNhap.id AS so_phieu_nhap,
+    PhieuNhap.ngay_nhap,
+    DonDatHang.ma_don,
+    VatTu.ma_vat_tu,
+    VatTu.ten_vat_tu,
+    CTPN.so_luong_nhap,
+    CTPN.don_gia_nhap,
+    CTPN.so_luong_nhap * CTPN.don_gia_nhap AS thanh_tien_nhap
+FROM
+    ChiTietPhieuNhap CTPN
+        JOIN
+    PhieuNhap ON CTPN.phieu_nhap_id = PhieuNhap.id
+        JOIN
+    DonDatHang ON PhieuNhap.don_hang_id = DonDatHang.id
+        JOIN
+    VatTu ON CTPN.vat_tu_id = VatTu.id;
+SELECT * FROM vw_CTPNHAP_VT_PN;
 
+-- Câu 4. Tạo view có tên vw_CTPNHAP_VT_PN_DH bao gồm các thông tin sau:
+-- số phiếu nhập hàng, ngày nhập hàng, số đơn đặt hàng, mã nhà cung cấp, mã vật tư, tên vật tư, số lượng nhập, đơn giá nhập, thành tiền nhập.
+CREATE VIEW vw_CTPNHAP_VT_PN_DH AS
+SELECT
+    PhieuNhap.id AS so_phieu_nhap,
+    PhieuNhap.ngay_nhap,
+    DonDatHang.ma_don,
+    NhaCungCap.ma_nha_cung_cap,
+    VatTu.ma_vat_tu,
+    VatTu.ten_vat_tu,
+    CTPN.so_luong_nhap,
+    CTPN.don_gia_nhap,
+    CTPN.so_luong_nhap * CTPN.don_gia_nhap AS thanh_tien_nhap
+FROM
+    ChiTietPhieuNhap CTPN
+        JOIN
+    PhieuNhap ON CTPN.phieu_nhap_id = PhieuNhap.id
+        JOIN
+    DonDatHang ON PhieuNhap.don_hang_id = DonDatHang.id
+        JOIN
+    NhaCungCap ON DonDatHang.nha_cung_cap_id = NhaCungCap.id
+        JOIN
+    VatTu ON CTPN.vat_tu_id = VatTu.id;
+
+SELECT * FROM vw_CTPNHAP_VT_PN_DH;
+
+-- Câu 5. Tạo view có tên vw_CTPNHAP_loc  bao gồm các thông tin sau:
+-- số phiếu nhập hàng, mã vật tư, số lượng nhập, đơn giá nhập, thành tiền nhập. Và chỉ liệt kê các chi tiết nhập có số lượng nhập > 5.
+CREATE VIEW vw_CTPNHAP_loc AS
+SELECT
+    CTPN.id AS so_phieu_nhap,
+    VatTu.ma_vat_tu,
+    CTPN.so_luong_nhap,
+    CTPN.don_gia_nhap,
+    CTPN.so_luong_nhap * CTPN.don_gia_nhap AS thanh_tien_nhap
+FROM
+    ChiTietPhieuNhap CTPN
+        JOIN
+    VatTu ON CTPN.vat_tu_id = VatTu.id
+WHERE
+    CTPN.so_luong_nhap > 5;
+
+SELECT * FROM vw_CTPNHAP_loc;
+-- Câu 6. Tạo view có tên vw_CTPNHAP_VT_loc bao gồm các thông tin sau:
+-- số phiếu nhập hàng, mã vật tư, tên vật tư, số lượng nhập, đơn giá nhập, thành tiền nhập.
+-- Và chỉ liệt kê các chi tiết nhập vật tư có đơn vị tính là Bộ.
+CREATE VIEW vw_CTPNHAP_VT_loc AS
+SELECT
+    CTPN.id AS so_phieu_nhap,
+    VatTu.ma_vat_tu,
+    VatTu.ten_vat_tu,
+    CTPN.so_luong_nhap,
+    CTPN.don_gia_nhap,
+    CTPN.so_luong_nhap * CTPN.don_gia_nhap AS thanh_tien_nhap
+FROM
+    ChiTietPhieuNhap CTPN
+        JOIN
+    VatTu ON CTPN.vat_tu_id = VatTu.id
+WHERE
+    VatTu.don_vi_tinh = 'Hộp';
+
+SELECT * FROM vw_CTPNHAP_VT_loc;
+DROP VIEW vw_CTPNHAP_VT_loc;
+
+-- Câu 7. Tạo view có tên vw_CTPXUAT bao gồm các thông tin sau: số phiếu xuất hàng, mã vật tư, số lượng xuất, đơn giá xuất, thành tiền xuất.
+CREATE VIEW vw_CTPXUAT AS
+SELECT
+    CTPX.id AS so_phieu_xuat,
+    VatTu.ma_vat_tu,
+    CTPX.so_luong_xuat,
+    CTPX.don_gia_xuat,
+    CTPX.so_luong_xuat * CTPX.don_gia_xuat AS thanh_tien_xuat
+FROM
+    ChiTietPhieuXuat CTPX
+        JOIN
+    VatTu ON CTPX.vat_tu_id = VatTu.id;
+
+SELECT * FROM vw_CTPXUAT;
+-- Câu 8. Tạo view có tên vw_CTPXUAT_VT bao gồm các thông tin sau: số phiếu xuất hàng, mã vật tư, tên vật tư, số lượng xuất, đơn giá xuất.
+CREATE VIEW vw_CTPXUAT_VT AS
+SELECT
+    CTPX.id AS so_phieu_xuat,
+    VatTu.ma_vat_tu,
+    VatTu.ten_vat_tu,
+    CTPX.so_luong_xuat,
+    CTPX.don_gia_xuat
+FROM
+    ChiTietPhieuXuat CTPX
+        JOIN
+    VatTu ON CTPX.vat_tu_id = VatTu.id;
+
+SELECT * FROM vw_CTPXUAT_VT;
+-- Câu 9. Tạo view có tên vw_CTPXUAT_VT_PX bao gồm các thông tin sau:
+-- số phiếu xuất hàng, tên khách hàng, mã vật tư, tên vật tư, số lượng xuất, đơn giá xuất.
+CREATE VIEW vw_CTPXUAT_VT_PX AS
+SELECT
+    CTPX.id AS so_phieu_xuat,
+    PhieuXuat.ten_khach_hang,
+    VatTu.ma_vat_tu,
+    VatTu.ten_vat_tu,
+    CTPX.so_luong_xuat,
+    CTPX.don_gia_xuat
+FROM
+    ChiTietPhieuXuat CTPX
+        JOIN
+    PhieuXuat ON CTPX.phieu_xuat_id = PhieuXuat.id
+        JOIN
+    VatTu ON CTPX.vat_tu_id = VatTu.id;
+SELECT * FROM vw_CTPXUAT_VT_PX;
