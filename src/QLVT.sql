@@ -324,3 +324,34 @@ FROM
         JOIN
     VatTu ON CTPX.vat_tu_id = VatTu.id;
 SELECT * FROM vw_CTPXUAT_VT_PX;
+
+-- Câu 1. Tạo Stored procedure (SP) cho biết tổng số lượng cuối của vật tư với mã vật tư là tham số vào.
+DELIMITER //
+
+CREATE PROCEDURE GetTotalQuantity(IN MVT VARCHAR(255))
+BEGIN
+SELECT SUM(tk.tong_so_luong_nhap - tk.tong_so_luong_xuat) AS Total_Quantity
+FROM TonKho tk
+         JOIN VatTu ON tk.vat_tu_id = VatTu.id
+WHERE VatTu.ma_vat_tu = MVT;
+END //
+
+DELIMITER ;
+
+CALL GetTotalQuantity('VT1');
+-- Câu 2. Tạo SP cho biết tổng tiền xuất của vật tư với mã vật tư là tham số vào, out là tổng tiền xuất
+DELIMITER //
+
+CREATE PROCEDURE GetTotalAmountExported(IN MVT VARCHAR(255), OUT TotalAmountExported INT)
+BEGIN
+SELECT SUM(CTPX.so_luong_xuat * CTPX.don_gia_xuat) AS Total_mount
+INTO TotalAmountExported
+FROM ChiTietPhieuXuat CTPX
+         JOIN VatTu ON CTPX.vat_tu_id = VatTu.id
+WHERE VatTu.ma_vat_tu = MVT;
+END //
+
+DELIMITER ;
+
+CALL GetTotalAmountExported('VT1', @TotalAmountExported);
+SELECT @TotalAmountExported;
