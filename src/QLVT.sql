@@ -355,3 +355,46 @@ DELIMITER ;
 
 CALL GetTotalAmountExported('VT1', @TotalAmountExported);
 SELECT @TotalAmountExported;
+
+-- Câu 3. Tạo SP cho biết tổng số lượng đặt theo số đơn hàng với số đơn hàng là tham số vào.
+DELIMITER //
+
+CREATE PROCEDURE GetTotalQuantityOrderedById(IN DHI INT, OUT TotalQuantityOrdered INT)
+BEGIN
+SELECT SUM(so_luong_dat) AS Total_Quantity
+INTO TotalQuantityOrdered
+FROM ChiTietDonHang
+WHERE don_hang_id = DHI;
+END //
+
+DELIMITER ;
+
+
+-- Câu 4. Tạo SP dùng để thêm một đơn đặt hàng.
+DELIMITER //
+
+CREATE PROCEDURE AddOrder(IN MD VARCHAR(255), IN NDH DATE, IN MNCC VARCHAR(255))
+BEGIN
+INSERT INTO DonDatHang (ma_don, ngay_dat_hang, nha_cung_cap_id)
+VALUES (MD, NDH, (SELECT id FROM NhaCungCap WHERE ma_nha_cung_cap = MNCC));
+END //
+
+DELIMITER ;
+
+CALL AddOrder('DDH4', '2023-12-23',1);
+SELECT * FROM DonDatHang;
+
+
+-- Câu 5. Tạo SP dùng để thêm một chi tiết đơn đặt hàng.
+DELIMITER //
+
+CREATE PROCEDURE AddOrderDetail(IN MD VARCHAR(255), IN MVT VARCHAR(255), IN SLD INT)
+BEGIN
+INSERT INTO ChiTietDonHang (don_hang_id, vat_tu_id, so_luong_dat)
+VALUES ((SELECT id FROM DonDatHang WHERE ma_don = MD), (SELECT id FROM VatTu WHERE ma_vat_tu = MVT), SLD);
+END //
+
+DELIMITER ;
+
+CALL AddOrderDetail(3,3, 70);
+SELECT * FROM Chitietdonhang;
